@@ -1,0 +1,1 @@
+public record CreateUserDTO(string name,string lastname);

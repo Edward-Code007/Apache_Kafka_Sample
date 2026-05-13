@@ -1,0 +1,1 @@
+public record CreateUser(string UUID,string name, string lastName);

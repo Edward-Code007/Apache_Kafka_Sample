@@ -1,0 +1,6 @@
+@Kafka_First_Aproach.Webapi_HostAddress = http://localhost:5086
+
+GET {{Kafka_First_Aproach.Webapi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
