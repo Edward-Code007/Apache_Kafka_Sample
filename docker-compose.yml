@@ -38,6 +38,22 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     networks:
       - network
+  topic_init:
+    image : apache/kafka:latest
+    container_name: topic_init
+    command: >
+      /opt/kafka/bin/kafka-topics.sh 
+      --create --topic users
+      --bootstrap-server broker-1:19092
+    depends_on:
+      broker-1:
+        condition: service_healthy
+      broker-2:
+        condition: service_healthy
+      broker-3:
+        condition: service_healthy
+    networks:
+      - network
   broker-1:
     image: apache/kafka:latest
     container_name: broker-1
@@ -53,15 +69,20 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller-1:9093,2@controller-2:9093,3@controller-3:9093
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-     
+
       KAFKA_MIN_INSYNC_REPLICAS: 2
-      KAFKA_DEFAULT_REPLICATION_FACTOR : 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE : true
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
     depends_on:
       - controller-1
       - controller-2
       - controller-3
+    healthcheck:
+      test: [ "CMD", "/opt/kafka/bin/kafka-metadata-quorum.sh", "--bootstrap-server", "0.0.0.0:19092", "describe","--status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - network
   broker-2:
@@ -79,15 +100,20 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller-1:9093,2@controller-2:9093,3@controller-3:9093
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      
+
       KAFKA_MIN_INSYNC_REPLICAS: 2
-      KAFKA_DEFAULT_REPLICATION_FACTOR : 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE : true
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
     depends_on:
       - controller-1
       - controller-2
       - controller-3
+    healthcheck:
+      test: [ "CMD", "/opt/kafka/bin/kafka-metadata-quorum.sh", "--bootstrap-server", "0.0.0.0:19092", "describe","--status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - network
   broker-3:
@@ -105,15 +131,20 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@controller-1:9093,2@controller-2:9093,3@controller-3:9093
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      
+
       KAFKA_MIN_INSYNC_REPLICAS: 2
-      KAFKA_DEFAULT_REPLICATION_FACTOR : 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_NUM_PARTITIONS: 3
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE : true
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
     depends_on:
       - controller-1
       - controller-2
       - controller-3
+    healthcheck:
+      test: [ "CMD", "/opt/kafka/bin/kafka-metadata-quorum.sh", "--bootstrap-server", "0.0.0.0:19092", "describe","--status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - network
   webapi:
@@ -124,10 +155,17 @@ services:
     ports:
       - 13000:13000
     environment:
-      Producer__Bootstrap_servers : "broker-1:19092,broker-2:19092,broker-3:19092"
-      Producer__Acks : "Leader"
-      Producer__ClientId : 1
+      Producer__Bootstrap_servers: "broker-1:19092,broker-2:19092,broker-3:19092"
+      Producer__Acks: "Leader"
+      Producer__ClientId: 1
       ASPNETCORE_URLS: "http://0.0.0.0:13000"
+    depends_on:
+      broker-1:
+        condition: service_healthy
+      broker-2:
+        condition: service_healthy
+      broker-3:
+        condition: service_healthy
     networks:
       - network
   consumer-1:
@@ -136,16 +174,18 @@ services:
       context: .
       dockerfile: ./Kafka_First_Aproach.Consumer/Dockerfile
     environment:
-      Consumer__Bootstrap_Server : "broker-1:19092,broker-2:19092,broker-3:19092"
-      Consumer__GroupId : "users-consumer"
-      Consumer__ClientId : "consumer1"
+      Consumer__Bootstrap_Server: "broker-1:19092,broker-2:19092,broker-3:19092"
+      Consumer__GroupId: "users-consumer"
+      Consumer__ClientId: "consumer1"
     depends_on:
-      - broker-1
-      - broker-2
-      - broker-3
-      - controller-1
-      - controller-2
-      - controller-3
+      broker-1:
+        condition: service_healthy
+      broker-2:
+        condition: service_healthy
+      broker-3:
+        condition: service_healthy
+      topic_init:     
+        condition: service_completed_successfully
     networks:
       - network
   consumer-2:
@@ -154,16 +194,18 @@ services:
       context: .
       dockerfile: ./Kafka_First_Aproach.Consumer/Dockerfile
     environment:
-      Consumer__Bootstrap_Server : "broker-1:19092,broker-2:19092,broker-3:19092"
-      Consumer__GroupId : "users-consumer"
-      Consumer__ClientId : "consumer2"
+      Consumer__Bootstrap_Server: "broker-1:19092,broker-2:19092,broker-3:19092"
+      Consumer__GroupId: "users-consumer"
+      Consumer__ClientId: "consumer2"
     depends_on:
-      - broker-1
-      - broker-2
-      - broker-3
-      - controller-1
-      - controller-2
-      - controller-3
+      broker-1:
+        condition: service_healthy
+      broker-2:
+        condition: service_healthy
+      broker-3:
+        condition: service_healthy
+      topic_init:
+        condition: service_completed_successfully
     networks:
       - network
 
