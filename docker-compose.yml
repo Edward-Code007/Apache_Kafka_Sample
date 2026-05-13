@@ -134,7 +134,7 @@ services:
     container_name: consumer-1
     build:
       context: .
-      dockerfile: ./Kafka_Users_Consumer/Dockerfile
+      dockerfile: ./Kafka_First_Aproach.Consumer/Dockerfile
     environment:
       Consumer__Bootstrap_Server : "broker-1:19092,broker-2:19092,broker-3:19092"
       Consumer__GroupId : "users-consumer"
@@ -152,7 +152,7 @@ services:
     container_name: consumer-2
     build:
       context: .
-      dockerfile: ./Kafka_Users_Consumer/Dockerfile
+      dockerfile: ./Kafka_First_Aproach.Consumer/Dockerfile
     environment:
       Consumer__Bootstrap_Server : "broker-1:19092,broker-2:19092,broker-3:19092"
       Consumer__GroupId : "users-consumer"
