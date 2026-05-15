@@ -28,11 +28,11 @@ jobs:
       with:
         file: ./Dockerfile.Webapi
         push: true
-        tag: edwardcoder423/webapi:v1
+        tag: edwardcoder423/webapi:v2
     - name: BuildNPush_Consumer
       uses: docker/build-push-action@v7.1.0
       with:
         file: ./Dockerfile.Consumer
         push: true
-        tag: edwardcoder423/consumer:v1
+        tag: edwardcoder423/consumer:v2
       
