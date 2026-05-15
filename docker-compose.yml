@@ -38,22 +38,6 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     networks:
       - network
-  topic_init:
-    image : apache/kafka:latest
-    container_name: topic_init
-    command: >
-      /opt/kafka/bin/kafka-topics.sh 
-      --create --topic users
-      --bootstrap-server broker-1:19092
-    depends_on:
-      broker-1:
-        condition: service_healthy
-      broker-2:
-        condition: service_healthy
-      broker-3:
-        condition: service_healthy
-    networks:
-      - network
   broker-1:
     image: apache/kafka:latest
     container_name: broker-1
@@ -149,9 +133,7 @@ services:
       - network
   webapi:
     container_name: webapi
-    build:
-      context: .
-      dockerfile: ./Kafka_First_Aproach.Webapi/Dockerfile
+    image: edwardcoder423/webapi:v1
     ports:
       - 13000:13000
     environment:
@@ -166,13 +148,31 @@ services:
         condition: service_healthy
       broker-3:
         condition: service_healthy
+      topic_init:
+        condition: service_completed_successfully
+    networks:
+      - network
+  topic_init:
+    image : apache/kafka:latest
+    container_name: topic_init
+    logging:
+      driver: "none"
+    entrypoint: /opt/kafka/bin/kafka-topics.sh 
+    command: > 
+      --create --topic users --if-not-exists
+      --bootstrap-server broker-1:19092
+    depends_on:
+      broker-1:
+        condition: service_healthy
+      broker-2:
+        condition: service_healthy
+      broker-3:
+        condition: service_healthy
     networks:
       - network
   consumer-1:
     container_name: consumer-1
-    build:
-      context: .
-      dockerfile: ./Kafka_First_Aproach.Consumer/Dockerfile
+    image: edwardcoder423/consumer:v1
     environment:
       Consumer__Bootstrap_Server: "broker-1:19092,broker-2:19092,broker-3:19092"
       Consumer__GroupId: "users-consumer"
@@ -190,9 +190,7 @@ services:
       - network
   consumer-2:
     container_name: consumer-2
-    build:
-      context: .
-      dockerfile: ./Kafka_First_Aproach.Consumer/Dockerfile
+    image: edwardcoder423/consumer:v1
     environment:
       Consumer__Bootstrap_Server: "broker-1:19092,broker-2:19092,broker-3:19092"
       Consumer__GroupId: "users-consumer"
@@ -208,7 +206,6 @@ services:
         condition: service_completed_successfully
     networks:
       - network
-
 networks:
   network:
-
+    
