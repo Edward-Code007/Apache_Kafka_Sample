@@ -1,0 +1,19 @@
+# Build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+
+COPY ./Kafka_First_Aproach.Webapi/ ./src/Kafka_First_Aproach.Webapi/
+COPY ./Kafka_First_Aproach.Contracts/ ./src/Kafka_First_Aproach.Contracts/
+COPY ./Kafka_First_Aproach.Consumer/Kafka_First_Aproach.Consumer.csproj ./src/Kafka_First_Aproach.Consumer/
+COPY ./KAFKA_FIRST_APROACH.slnx ./src/
+WORKDIR /src
+RUN dotnet restore KAFKA_FIRST_APROACH.slnx
+
+RUN dotnet publish ./Kafka_First_Aproach.Webapi/Kafka_First_Aproach.Webapi.csproj -c Release -o /app
+
+# Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+COPY --from=build /app .
+EXPOSE 13000
+ENTRYPOINT ["dotnet", "webapi.dll"]
+
