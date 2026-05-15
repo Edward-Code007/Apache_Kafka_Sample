@@ -5,7 +5,7 @@ COPY ./Kafka_First_Aproach.Consumer/ ./src/Kafka_First_Aproach.Consumer/
 COPY ./Kafka_First_Aproach.Contracts/ ./src/Kafka_First_Aproach.Contracts/
 WORKDIR /src
 RUN dotnet restore ./Kafka_First_Aproach.Consumer/Kafka_First_Aproach.Consumer.csproj 
-RUN ./Kafka_First_Aproach.Contracts/Kafka_First_Aproach.Contracts.csproj
+RUN dotnet restore ./Kafka_First_Aproach.Contracts/Kafka_First_Aproach.Contracts.csproj
 
 RUN dotnet publish ./Kafka_First_Aproach.Consumer/Kafka_First_Aproach.Consumer.csproj -c Release -o /app
 
