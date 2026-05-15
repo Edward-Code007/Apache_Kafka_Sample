@@ -3,10 +3,8 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 COPY ./Kafka_First_Aproach.Consumer/ ./src/Kafka_First_Aproach.Consumer/
 COPY ./Kafka_First_Aproach.Contracts/ ./src/Kafka_First_Aproach.Contracts/
-COPY ./Kafka_First_Aproach.Webapi/Kafka_First_Aproach.Webapi.csproj ./src/Kafka_First_Aproach.Webapi/
-COPY ./KAFKA_FIRST_APROACH.slnx ./src/
 WORKDIR /src
-RUN dotnet restore KAFKA_FIRST_APROACH.slnx
+RUN dotnet restore ./Kafka_First_Aproach.Consumer/ ./Kafka_First_Aproach.Contracts/
 
 RUN dotnet publish ./Kafka_First_Aproach.Consumer/Kafka_First_Aproach.Consumer.csproj -c Release -o /app
 
