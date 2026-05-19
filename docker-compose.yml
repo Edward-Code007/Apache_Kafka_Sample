@@ -133,7 +133,7 @@ services:
       - network
   webapi:
     container_name: webapi
-    image: edwardcoder423/webapi:v1
+    image: edwardcoder423/webapi:v2
     ports:
       - 13000:13000
     environment:
@@ -172,7 +172,7 @@ services:
       - network
   consumer-1:
     container_name: consumer-1
-    image: edwardcoder423/consumer:v1
+    image: edwardcoder423/consumer:v2
     environment:
       Consumer__Bootstrap_Server: "broker-1:19092,broker-2:19092,broker-3:19092"
       Consumer__GroupId: "users-consumer"
@@ -190,7 +190,7 @@ services:
       - network
   consumer-2:
     container_name: consumer-2
-    image: edwardcoder423/consumer:v1
+    image: edwardcoder423/consumer:v2
     environment:
       Consumer__Bootstrap_Server: "broker-1:19092,broker-2:19092,broker-3:19092"
       Consumer__GroupId: "users-consumer"
