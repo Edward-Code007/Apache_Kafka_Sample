@@ -1,3 +1,5 @@
+name: BuildN`Test
+
 on:
     workflow_call:
 jobs:
