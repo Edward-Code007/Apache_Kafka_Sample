@@ -5,6 +5,7 @@
     <RootNamespace>Kafka_Fist_Aproach.Contracts</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
   </PropertyGroup>
 
 </Project>

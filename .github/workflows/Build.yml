@@ -1,0 +1,33 @@
+name: BuildN`Test
+
+on:
+    workflow_call:
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CheckOut_Repo
+        uses: actions/checkout@v4
+
+      - name: SetUp_Dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore_Dep 
+        run: dotnet restore
+
+      - name: Build_Projects
+        run: dotnet build
+
+      - name: Run_Unit_Tests
+        run: dotnet test
+      
+
+
+
+	
+	
+
+
+

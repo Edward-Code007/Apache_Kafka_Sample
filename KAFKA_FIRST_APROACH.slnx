@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Kafka_First_Aproach.Contracts/Kafka_First_Aproach.Contracts.csproj" />
+  <Project Path="Kafka_First_Aproach.Test/Kafka_First_Aproach.Test.csproj" />
   <Project Path="Kafka_First_Aproach.Webapi/Kafka_First_Aproach.Webapi.csproj" />
   <Project Path="Kafka_First_Aproach.Consumer/Kafka_First_Aproach.Consumer.csproj" />
 </Solution>

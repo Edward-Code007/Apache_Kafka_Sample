@@ -1,4 +1,4 @@
-public interface IConsumer<T>
+public interface IConsumer
 {
-    public Task ConsumeAsync(string topic);
+    public Task ConsumeAsync(string topic,CancellationToken stoppingToken);
 }

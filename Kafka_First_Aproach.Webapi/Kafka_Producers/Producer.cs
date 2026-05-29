@@ -5,13 +5,18 @@ using Microsoft.Extensions.Options;
 public class Producer<T> : IProducer<T>
 {
     private ProducerOpts _producerConfig { init; get; }
-    private ILogger<Producer<T>> _logger{get;set;}
-    public Producer(ILogger<Producer<T>> logger,IOptions<ProducerOpts> producerConfig)
+    private ILogger<Producer<T>> _logger { get; set; }
+    public Producer(ILogger<Producer<T>> logger, IOptions<ProducerOpts> producerConfig)
     {
         this._producerConfig = producerConfig.Value;
         this._logger = logger;
     }
     public async Task ProduceAsync(string topic, string key, T value)
+    {
+        var producerInstance = BuildProducer();
+        await StartProducer(producerInstance, topic, key, value);
+    }
+    public IProducer<string, string> BuildProducer()
     {
         var prodConfig = new ProducerConfig
         {
@@ -27,18 +32,23 @@ public class Producer<T> : IProducer<T>
         .SetKeySerializer(Serializers.Utf8)
         .SetValueSerializer(Serializers.Utf8)
         .Build();
+        return producerInstance;
+    }
+    public async Task StartProducer(IProducer<string, string> producerInstance, string topic, string key, T value)
+    {
         try
         {
-        await producerInstance.ProduceAsync(topic, new Message<string, string>
-        {
-            Key = key,
-            Value = JsonSerializer.Serialize(value)
-        });
+            await producerInstance.ProduceAsync(topic, new Message<string, string>
+            {
+                Key = key,
+                Value = JsonSerializer.Serialize(value)
+            });
         }
-        catch(Exception exc)
+        catch (Exception exc)
         {
             this._logger.LogError($"Error Fatal: {exc.Message}");
             throw;
         }
     }
+
 }
