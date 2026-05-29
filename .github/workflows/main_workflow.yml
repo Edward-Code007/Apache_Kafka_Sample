@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 jobs:
   Build_N_Test:
-     uses: ./.github/workflows/Build.yml
+     uses: ./.github/workflows/build.yml
   Push_Images:
     runs-on: ubuntu-latest
     
