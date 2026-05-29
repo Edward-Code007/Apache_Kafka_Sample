@@ -1,4 +1,4 @@
-name: BuildN`Test
+name: BuildNTest
 
 on:
     workflow_call:
