@@ -3,12 +3,10 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.Configure<ProducerOpts>(
-    builder.Configuration.GetSection("Producer"));
-builder.Services.AddScoped(typeof(IProducer<>),typeof(Producer<>));
+builder.Configuration.GetSection("Producer"));
+builder.Services.AddScoped(typeof(IProducer<>), typeof(Producer<>));
 
 var app = builder.Build();
 
@@ -21,11 +19,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/user",async (CreateUserDTO user,IProducer<CreateUser> producer) =>
+app.MapPost("/user", async (CreateUserDTO user, IProducer<CreateUser> producer) =>
 {
-    CreateUser userNew = new CreateUser(Guid.CreateVersion7().ToString(),user.name,user.lastname);
-   await producer.ProduceAsync("users",userNew.UUID,userNew);
-   return Results.Ok("Usuario Siendo Procesado");
+    CreateUser userNew = new CreateUser(Guid.CreateVersion7().ToString(), user.name, user.lastname);
+    var result = await producer.ProduceAsync("users", userNew.UUID, userNew);
+    if (result.isSuccess)
+    {
+        return Results.Ok("Usuario Siendo Procesado");
+    }
+    return Results.BadRequest<string>("Ocurrio un error intente mas tarde");
 });
 
 

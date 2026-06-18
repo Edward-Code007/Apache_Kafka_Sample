@@ -44,11 +44,14 @@ public class Producer<T> : IProducer<T>
                 Key = key,
                 Value = JsonSerializer.Serialize(value)
             });
+            return deliveryResult.Status;
         }
-        catch (Exception exc)
+        catch (Exception)
         {
             return "Ocurrio un Error intente mas tarde";
         }
+
+
     }
 
 }
