@@ -11,10 +11,11 @@ public class Producer<T> : IProducer<T>
         this._producerConfig = producerConfig.Value;
         this._logger = logger;
     }
-    public async Task ProduceAsync(string topic, string key, T value)
+    public async Task<ResultPattern<PersistenceStatus>> ProduceAsync(string topic, string key, T value)
     {
         var producerInstance = BuildProducer();
-        await StartProducer(producerInstance, topic, key, value);
+        return await ProduceMessage(producerInstance, topic, key, value);
+
     }
     public IProducer<string, string> BuildProducer()
     {
@@ -34,11 +35,11 @@ public class Producer<T> : IProducer<T>
         .Build();
         return producerInstance;
     }
-    public async Task StartProducer(IProducer<string, string> producerInstance, string topic, string key, T value)
+    public async Task<ResultPattern<PersistenceStatus>> ProduceMessage(IProducer<string, string> producerInstance, string topic, string key, T value)
     {
         try
         {
-            await producerInstance.ProduceAsync(topic, new Message<string, string>
+            var deliveryResult = await producerInstance.ProduceAsync(topic, new Message<string, string>
             {
                 Key = key,
                 Value = JsonSerializer.Serialize(value)
@@ -46,8 +47,7 @@ public class Producer<T> : IProducer<T>
         }
         catch (Exception exc)
         {
-            this._logger.LogError($"Error Fatal: {exc.Message}");
-            throw;
+            return "Ocurrio un Error intente mas tarde";
         }
     }
 

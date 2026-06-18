@@ -1,17 +1,16 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
-public class Consumer(ILogger<Consumer> _logger,IOptions<OptConsumer> optConsumer) : IConsumer
+public class Consumer(ILogger<Consumer> _logger, IOptions<OptConsumer> optConsumer) : IConsumer
 {
-    public async Task ConsumeAsync(string topic,CancellationToken stoppingToken)
+    public async Task ConsumeAsync(string topic, CancellationToken stoppingToken)
     {
-       var consumerInstance = BuildConsumer();
+        var consumerInstance = BuildConsumer();
         consumerInstance.Subscribe(topic);
 
-        StreamWriter writer = new StreamWriter("./data_users",true);
-        ConsumeData(consumerInstance,writer,stoppingToken);
+        await ConsumeData(consumerInstance,  stoppingToken);
     }
-    private Confluent.Kafka.IConsumer<string,string> BuildConsumer()
+    public Confluent.Kafka.IConsumer<string, string> BuildConsumer()
     {
         var _optConsumer = optConsumer.Value;
         var consumerConfig = new ConsumerConfig
@@ -21,7 +20,6 @@ public class Consumer(ILogger<Consumer> _logger,IOptions<OptConsumer> optConsume
             GroupId = _optConsumer.GroupId,
             ClientId = _optConsumer.ClientId,
             AllowAutoCreateTopics = true,
-            
         };
         var consumerInstance = new ConsumerBuilder<string, string>(consumerConfig)
         .SetKeyDeserializer(Deserializers.Utf8)
@@ -29,29 +27,28 @@ public class Consumer(ILogger<Consumer> _logger,IOptions<OptConsumer> optConsume
         .Build();
         return consumerInstance;
     }
-    private async void ConsumeData(Confluent.Kafka.IConsumer<string,string> consumerInstance,StreamWriter writer,CancellationToken stoppingToken)
+    public async Task ConsumeData(Confluent.Kafka.IConsumer<string, string> consumerInstance,CancellationToken stoppingToken)
     {
         try
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var data = consumerInstance.Consume(100);
-                    if(data is not null)
-                    {
-                    var message = data.Message;
-                   await writer.WriteLineAsync(message.Value);
-                   _logger.LogInformation(message.Value);     
-                   _logger.LogInformation("Escrito Correctamente");     
-                    }
+                var data = consumerInstance.Consume(150);
+                if (data is not null)
+                {
+                    await TryWritetoDisk(data.Message,"./data_users",true);
+                    _logger.LogInformation("Write Success: " + data.Message);
+                }
             }
-
         }
         finally
         {
-            writer.Close();
-            writer.Dispose();
             consumerInstance.Close();
-            
         }
+    }
+    public async Task TryWritetoDisk(Message<string, string> message, string path, bool append)
+    {
+       using StreamWriter writer = new StreamWriter(path, append);
+       await writer.WriteLineAsync(message.Value);      
     }
 }
